@@ -18,9 +18,9 @@ This repository contains some popular deep learning models for sentence represen
 For now, the models listed bellow are add into this repo. Some benchmarks for these models are also given.
 
 
-| Model | <td colspan=2>TREC-6<sup>[1](#foottime)</sup> <td colspan=2>SST-2<sup>[2](#foottime)</sup>
+| Model <td colspan=2>TREC-6<sup>[1](#foottime)</sup> <td colspan=2>SST-2<sup>[2](#foottime)</sup>
 | -
-| - | valid | test | valid | test |
+|      | valid | test | valid | test |
 | LSTM | - | 93.6 | 84.9 | 87.2 |
 
 <a name="foottime">1</a>: The best accuracy on test set is reported since it has no development set.
