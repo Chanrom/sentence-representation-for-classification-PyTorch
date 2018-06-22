@@ -20,8 +20,8 @@ from utils.config import *
 parser = argparse.ArgumentParser(description='train.py')
 
 # dataset configuration
-parser.add_argument('-config_file', type=str, default='./trec/trec-6.conf',
-                    help='model configuration for a dataset, i.e. \'./trec/trec-6.conf\'')
+parser.add_argument('-config_file', type=str, default='./trec/trec.conf',
+                    help='model configuration for a dataset, i.e. \'./trec/trec.conf\'')
 parser.add_argument('-flag', type=str, default='',
                     help='unique flag ')
 # GPU
@@ -190,10 +190,12 @@ def main():
                             batch_first=True)
     label_field = data.Field(sequential=False, unk_token=None)
 
+    dataset_info = None
     train_loader = None
     valid_loader = None
     test_loader = None
-    if config['dataset'] == 'TREC-6':
+
+    if config['dataset'] == 'TREC':
         dataset_splits = datasets.TREC.splits(
             root='data', text_field=text_field, label_field=label_field,
             fine_grained=config['fine_grained'])
@@ -216,10 +218,36 @@ def main():
         train_loader, valid_loader = data.BucketIterator.splits(
             datasets=dataset_splits, batch_size=config['batch_size'],
             sort_within_batch=True, device=config['gpu'])
-        print '* OK.'
 
-    elif config['dataset'] == 'SST-2':
-        pass
+    elif config['dataset'] == 'SST':
+        filter_pred = None
+        if not config['fine_grained']:
+            filter_pred = lambda ex: ex.label != 'neutral'
+
+        dataset_splits = datasets.SST.splits(
+            root='data', text_field=text_field, label_field=label_field,
+            fine_grained=config['fine_grained'], filter_pred=filter_pred)
+
+        text_field.build_vocab(*dataset_splits, vectors=config['pretrained'])
+        label_field.build_vocab(*dataset_splits)
+        num_tokens = len(text_field.vocab)
+        num_classes = len(label_field.vocab)
+        PAD_ID = text_field.vocab.stoi['<pad>']
+        dataset_info = {'num_tokens':num_tokens,
+                        'num_classes':num_classes,
+                        'PAD_ID':PAD_ID}
+
+        print '  initialize with pretrained vectors: %s' % config['pretrained']
+        print '  number of classes: %d' % num_classes
+        print '  number of tokens: %d' % num_tokens
+        print '  max batch size: %d' % config['batch_size']
+
+        # sort_within_batch is set True because we may use nn.LSTM
+        train_loader, valid_loader, test_loader = data.BucketIterator.splits(
+            datasets=dataset_splits, batch_size=config['batch_size'],
+            sort_within_batch=True, device=config['gpu'])
+
+    print '* OK.'
 
     print '* Building model...'
     cls_model = RepModel(config, dataset_info)

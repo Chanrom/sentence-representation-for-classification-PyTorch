@@ -5,6 +5,7 @@ import numpy as np
 import math
 import torch.nn.init as init
 from torch.autograd import Variable
+import torch.nn.functional as F
 from torch.nn.utils.rnn import pad_packed_sequence as unpack
 from torch.nn.utils.rnn import pack_padded_sequence as pack
 
@@ -61,8 +62,49 @@ class LSTM(nn.Module):
             rep = last_hidden
         elif self.merge == 'mean':
             rep = self.avg_reps(reps, length)
-        else:
-            raise NotImplementedError
+        elif self.merge == 'last':
+            rep = h_t
+
+        return self.dropout(rep), None
+
+
+
+class CNN(nn.Module):
+    def __init__(self, config):
+        super(CNN, self).__init__()
+
+        self.kernel_sizes = [int(x) for x in config['kernel_sizes'].split(',')]
+        self.max_filter_size = max(self.kernel_sizes)
+        self.kernel_num = config['mem_size']
+        assert self.kernel_num % len(self.kernel_sizes) == 0
+
+        self.convs = nn.ModuleList([nn.Conv2d(1,
+                    self.kernel_num/len(self.kernel_sizes),
+                    (k, config['word_vec_size'])) for k in self.kernel_sizes])
+
+        self.dropout = nn.Dropout(config['dropout'])
+
+
+    def forward(self, tokens_emb, length):
+        max_len = tokens_emb.size(1)
+
+        # if longest sentence in the batch is too short
+        if self.max_filter_size > max_len:
+            tokens_zeros = Variable(tokens_emb.data.new(tokens_emb.size(0),
+                                self.max_filter_size - max_len,
+                                tokens_emb.size(2)))
+            tokens_emb = torch.cat([tokens_emb, tokens_zeros], 1)
+        tokens_emb = tokens_emb.unsqueeze(1)  # (batch_size, 1, max_len, word_dim)
+
+        # [(batch_size, kernel_num/len(kernel_size), max_len), ...]*len(kernel_size)
+        sentence_embs = [F.relu(conv(tokens_emb)).squeeze(3)\
+                         for conv in self.convs]
+
+        # [(batch_size, kernel_num/len(kernel_size)), ...]*len(kernel_size)
+        sentence_embs = [F.max_pool1d(i, i.size(2)).squeeze(2)\
+                         for i in sentence_embs]
+
+        rep = torch.cat(sentence_embs, 1) # (batch_size, kernel_num)
 
         return self.dropout(rep), None
 
