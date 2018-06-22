@@ -18,7 +18,7 @@ This repository contains some popular deep learning models for sentence represen
 For now, the models listed bellow are add into this repo. Some benchmarks for these models are also given.
 
 
-|   Model     | TREC6-valid | TREC6-test  |   SST2-valid   |    SST2-test   |
+|   Model     | TREC6-valid<sup>[1](#foottime)</sup> | TREC6-test  |   SST2-valid<sup>[2](#foottime)</sup>   |    SST2-test   |
 | ------------| :----: | :---------: | :-------: | :----------: |
 |   LSTM      |  -          |   93.6      |   84.9         |    87.2        |
 
