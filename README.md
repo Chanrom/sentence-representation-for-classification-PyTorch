@@ -9,9 +9,10 @@ This repository contains some popular deep learning models for sentence represen
 
 ## Folder Structure
 * model file: 
-** model/model.py, contains the deep models for sentence representation.
+ * model/model.py, contains the deep models for sentence representation.
 * training framework: train.py - preprocesses the data and trains the network.
-* configuration files: i.e. trec/trec.conf, the config file used to set the dataset and networks.
+* configuration files
+ *i.e. trec/trec.conf, the config file used to set the dataset and networks.
 * help function: utils/utils.py. some helper functions.
 
 ## Models [IN PROGRESS]
