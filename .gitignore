@@ -1,0 +1,6 @@
+
+.vector_cache/
+
+data/
+
+*.pyc
