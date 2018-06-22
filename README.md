@@ -19,7 +19,7 @@ For now, the models listed bellow are add into this repo. Some benchmarks for th
 
 
 |   Model     | TREC6-valid | TREC6-test  |   SST2-valid   |    SST2-test   |
-|-
+| ------------| :----: | :---------: | :-------: | :----------: |
 |   LSTM      |  -          |   93.6      |   84.9         |    87.2        |
 
 <a name="foottime">1</a>: The best accuracy on test set is reported since it has no development set.
