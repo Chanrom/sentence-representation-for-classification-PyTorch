@@ -23,6 +23,7 @@ For now, the models listed bellow are add into this repo. Some benchmarks for th
 |   LSTM      |  -          |   93.6      |   84.9         |    87.2        |
 
 <a name="foottime">1</a>: The best accuracy on test set is reported since it has no development set.
+
 <a name="foottime">2</a>: Only the sentence-level training samples are used.
 
 ### LSTMs
