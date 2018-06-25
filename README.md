@@ -36,7 +36,7 @@ For now, the models listed bellow are add into this repo. Some benchmarks for th
 * [Long short-term memory network](http://web.eecs.utk.edu/~itamar/courses/ECE-692/Bobby_paper1.pdf)
 
 ### CNNs
-* borrow some code on [cnn-text-classification-pytorch](https://github.com/Shawn1993/cnn-text-classification-pytorch)
+* borrow some code from [cnn-text-classification-pytorch](https://github.com/Shawn1993/cnn-text-classification-pytorch)
 * [Convolutional Neural Networks for Sentence Classification](https://arxiv.org/pdf/1408.5882.pdf)
 
 ### Self-Attentive Sentence Embedding
