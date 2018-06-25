@@ -47,7 +47,6 @@ class LSTM(nn.Module):
     def forward(self, tokens_emb, length):
         batch_size = tokens_emb.size(0)
 
-        # transporse because of LSTM accepting seq_len*batch_size
         tokens_emb = pack(tokens_emb, length, batch_first=True)
 
         outputs, states_t = self.rnn(tokens_emb)
@@ -64,6 +63,8 @@ class LSTM(nn.Module):
             rep = self.avg_reps(reps, length)
         elif self.merge == 'last':
             rep = h_t
+        elif self.merge == 'all':
+            rep = reps
 
         return self.dropout(rep), None
 
@@ -107,6 +108,84 @@ class CNN(nn.Module):
         rep = torch.cat(sentence_embs, 1) # (batch_size, kernel_num)
 
         return self.dropout(rep), None
+
+
+class SelfAttn(nn.Module):
+    def __init__(self, config):
+        super(SelfAttn, self).__init__()
+
+        self.mem_size = config['mem_size']
+        self.attn_size = config['attn_size']
+        self.hops = config['hops']
+        self.layers = config['layer']
+        self.num_directions = 2 if config['brnn'] else 1
+        assert self.mem_size % self.num_directions == 0
+        self.hidden_size = self.mem_size // self.num_directions
+        self.merge = config['merge'] # how to use all LSTM hidden states
+
+        self.rnn = nn.LSTM(config['word_vec_size'], self.hidden_size,
+                        num_layers=self.layers,
+                        dropout=config['dropout'],
+                        bidirectional=config['brnn'],
+                        batch_first=True)
+
+        self.ws1 = nn.Linear(self.mem_size, self.attn_size, bias=False)
+        self.ws2 = nn.Linear(self.attn_size, self.hops, bias=False)
+
+        self.dropout = nn.Dropout(config['dropout'])
+
+        self.tanh = nn.Tanh()
+        self.sm = nn.Softmax()
+        self.gpu = config['gpu']
+
+
+    def get_mask(self, lens):
+        mask = []
+        max_len = max(lens)
+        for l in lens:
+            mask.append([1]*l + [0]*(max_len - l))
+        mask = Variable(torch.FloatTensor(mask))
+        if self.gpu != -1:
+            return mask.cuda()
+        else:
+            return mask
+
+
+    def forward(self, tokens_emb, length):
+        batch_size = tokens_emb.size(0)
+
+        tokens_emb = pack(tokens_emb, length, batch_first=True)
+
+        outputs, states_t = self.rnn(tokens_emb)
+        reps, _ = unpack(outputs, batch_first=True)
+        # print 'reps', reps
+
+        size = reps.size()
+        compressed_reps = reps.contiguous().view(-1, size[2])  # (batch_size x seq_len) * mem_size
+
+        hbar = self.tanh(self.ws1(compressed_reps))  # (batch_size x seq_len) * attn_size
+        alphas = self.ws2(hbar).view(size[0], size[1], -1)  # batch_size * seq_len * hops
+        alphas = torch.transpose(alphas, 1, 2).contiguous()  # batch_size * hops * seq_len
+
+        mask = self.get_mask(length)
+        # print 'mask', mask
+        multi_mask = [mask.unsqueeze(1) for i in range(self.hops)]
+        multi_mask = torch.cat(multi_mask, 1)
+        # print 'multi_mask', multi_mask
+
+        penalized_alphas = alphas + -1e7 * (1 - multi_mask)
+        alphas = self.sm(penalized_alphas.view(-1, size[1]))  # (batch_size x hops) * seq_len
+        alphas = alphas.view(size[0], self.hops, size[1])  # batch_size * hops * seq_len
+        # print 'alphas', alphas
+
+        reps = torch.bmm(alphas, reps) # batch_size * hops * hidden_size
+        # print 'reps', reps
+        # here we use mean pooling of all hops
+        rep = reps.mean(1)
+        assert len(rep.size()) == 2
+
+        # batch_size * classes, batch_size * hops * seq_len
+        return self.dropout(rep), alphas
 
 
 
@@ -175,6 +254,8 @@ class RepModel(nn.Module):
             self.encoder = LSTM(config)
         elif config['encoder'] == 'CNN':
             self.encoder = CNN(config)
+        elif config['encoder'] == 'SelfAttn':
+            self.encoder = SelfAttn(config)
         else:
             raise RuntimeError("Invalid model name: " + config['encoder'])
 
@@ -187,8 +268,9 @@ class RepModel(nn.Module):
 
         outputs = self.encoder(tokens_emb, length)
         sentence_emb = outputs[0]
+        extra_out = outputs[1]
 
         logits = self.classifier(sentence_emb)
 
-        return logits, None # None for placeholder
+        return logits, extra_out # extra_out can be 'attention weight' or other intermediate information
 

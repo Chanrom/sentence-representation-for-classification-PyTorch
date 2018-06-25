@@ -8,10 +8,10 @@ This repository contains some popular deep learning models for sentence represen
 * torchtext 0.2
 
 ## Folder Structure
-* model file: 
+* model file:
    * model/model.py, contains the deep models for sentence representation.
 * training framework: train.py - preprocesses the data and trains the network.
-* configuration files
+* configuration files:
    * i.e. trec/trec.conf, the config file used to set the dataset and networks.
 * help function: utils/utils.py. some helper functions.
 
@@ -25,6 +25,7 @@ For now, the models listed bellow are add into this repo. Some benchmarks for th
 |   LSTM      |      -     |     94.6     |   84.98    |    85.45     |
 |   Bi-LSTM   |      -     |     94.4     |   85.21    |    86.44     |
 |   CNN       |      -     |     95.2     |   84.63    |    84.73     |
+|   SelfAttn  |      -     |     96.0     |   85.44    |    86.66     |
 
 
 <a name="foottime">1</a>: The best accuracy on test set is reported since it has no development set.
@@ -37,3 +38,7 @@ For now, the models listed bellow are add into this repo. Some benchmarks for th
 ### CNNs
 * heavily based on [cnn-text-classification-pytorch](https://github.com/Shawn1993/cnn-text-classification-pytorch)
 * [Convolutional Neural Networks for Sentence Classification](https://arxiv.org/pdf/1408.5882.pdf)
+
+### Structured Self-Attentive
+* brought some codes from [Structured-Self-Attentive-Sentence-Embedding](https://github.com/ExplorerFreda/Structured-Self-Attentive-Sentence-Embedding)
+* [A Structured Self-Attentive Sentence Embedding](https://arxiv.org/pdf/1703.03130.pdf)

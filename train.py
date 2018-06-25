@@ -70,7 +70,14 @@ def eval(model, criterion, data_loader):
         outputs = model(tokens, length)
         logits = outputs[0]
 
-        loss = criterion(input=logits, target=label)
+        if isinstance(model, SelfAttn): # Self-attention model need penalize attention weights
+            attns = outputs[1]
+            attentionT = torch.transpose(attention, 1, 2).contiguous()
+            I  = get_I(batch_size, config['hops'], config['gpu'])
+            extra_loss = Frobenius(torch.bmm(attention, attentionT) - I[:attention.size(0)])
+            loss = criterion(input=logits, target=label) + config['penalization_coeff'] * extra_loss
+        else:
+            loss = criterion(input=logits, target=label)
 
         num += batch_size
         batch_right = unwrap_scalar_variable(torch.eq(label,
@@ -115,7 +122,15 @@ def train_models(model, train_loader, valid_loader, test_loader, optim):
             batch_size = len(label)
             outputs = model(tokens, length)
             logits = outputs[0]
-            loss = nll_crit(input=logits, target=label)
+
+            if isinstance(model, SelfAttn): # Self-attention model need penalize attention weights
+                attns = outputs[1]
+                attentionT = torch.transpose(attention, 1, 2).contiguous()
+                I  = get_I(batch_size, config['hops'], config['gpu'])
+                extra_loss = Frobenius(torch.bmm(attention, attentionT) - I[:attention.size(0)])
+                loss = nll_crit(input=logits, target=label) + config['penalization_coeff'] * extra_loss
+            else:
+                loss = nll_crit(input=logits, target=label)
 
             optim.zero_grad()
             loss.backward()
