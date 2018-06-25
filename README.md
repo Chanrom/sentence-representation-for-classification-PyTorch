@@ -17,7 +17,7 @@ This repository contains some popular deep learning models for sentence represen
 
 ## Models [IN PROGRESS]
 
-For now, the models listed bellow are add into this repo. Some benchmarks for these models are also given (the hyper-parameters are far from being optimal, so the performances of these models can be improved with carefully tuning).
+For now, the models listed bellow are add into this repo. Some benchmarks for these models are also given (the hyper-parameters are far from being optimal, the performances of these models can be improved with carefully tuning).
 
 
 |   Model     |  TREC6-valid<sup>[1](#foottime)</sup> | TREC6-test  |   SST2-valid<sup>[2](#foottime)</sup>   |    SST2-test   |
@@ -39,6 +39,6 @@ For now, the models listed bellow are add into this repo. Some benchmarks for th
 * heavily based on [cnn-text-classification-pytorch](https://github.com/Shawn1993/cnn-text-classification-pytorch)
 * [Convolutional Neural Networks for Sentence Classification](https://arxiv.org/pdf/1408.5882.pdf)
 
-### Structured Self-Attentive
+### Self-Attentive Sentence Embedding
 * brought some codes from [Structured-Self-Attentive-Sentence-Embedding](https://github.com/ExplorerFreda/Structured-Self-Attentive-Sentence-Embedding)
 * [A Structured Self-Attentive Sentence Embedding](https://arxiv.org/pdf/1703.03130.pdf)
