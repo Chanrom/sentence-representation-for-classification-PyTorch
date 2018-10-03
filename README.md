@@ -26,7 +26,7 @@ For now, the models listed bellow are add into this repo. Some benchmarks for th
 |   Bi-LSTM   |      -     |     94.4     |   85.21    |    86.44     |
 |   CNN       |      -     |     95.2     |   84.63    |    84.73     |
 |   SelfAttn  |      -     |     96.0     |   85.44    |    86.66     |
-
+|   BCN       |      -     |     95.0     |   85.67    |    86.66     |
 
 <a name="foottime">1</a>: The best accuracy on test set is reported since it has no development set.
 
@@ -42,3 +42,7 @@ For now, the models listed bellow are add into this repo. Some benchmarks for th
 ### Self-Attentive Sentence Embedding
 * borrow some code from [Structured-Self-Attentive-Sentence-Embedding](https://github.com/ExplorerFreda/Structured-Self-Attentive-Sentence-Embedding)
 * [A Structured Self-Attentive Sentence Embedding](https://arxiv.org/pdf/1703.03130.pdf)
+
+### Learned in Translation: Contextualized Word Vectors
+* borrow some code from [salesforce/cove](https://github.com/salesforce/cove)
+* [Learned in Translation: Contextualized Word Vectors](http://papers.nips.cc/paper/7209-learned-in-translation-contextualized-word-vectors.pdf)
