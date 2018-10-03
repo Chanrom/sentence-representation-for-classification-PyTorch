@@ -267,11 +267,19 @@ def main():
     print '* Building model...'
     cls_model = RepModel(config, dataset_info)
 
+    for p in cls_model.parameters():
+        p.data.uniform_(-config['param_init'], config['param_init'])
+
+    # paramters initialize
     if config['pretrained']:
         cls_model.word_lut.weight.data.set_(text_field.vocab.vectors)
     if config['fix_word_emb']:
         print '  will not update word embeddings'
         cls_model.word_lut.weight.requires_grad = False
+    if config['fix_mtlstm_weight']:
+        print '  will not update mtlstm'
+        for p in cls_model.encoder.rnn.parameters():
+            p.requires_grad = False
 
     cls_model = cls_model.cuda() if config['gpu'] != -1 else cls_model
     params = [p for p in cls_model.parameters() if p.requires_grad]

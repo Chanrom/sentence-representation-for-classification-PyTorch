@@ -363,7 +363,6 @@ class Classifier(nn.Module):
                         config['hid_sizes_cls'].split(',') if x]
         assert len(self.hidden_sizes) >= 1
         self.layers = len(self.hidden_sizes) + 1 # including the output layer
-        self.param_init = config['param_init']
 
         self.dropout = nn.Dropout(config['dropout'])
 
