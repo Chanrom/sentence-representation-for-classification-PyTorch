@@ -7,12 +7,17 @@ This repository contains some popular deep learning models for sentence represen
 * pytorch 0.2
 * torchtext 0.2
 
+## Usage
+
+    python train.py -conf [config file] 
+Choose the config file that used to set the datasets and models.
+
 ## Folder Structure
 * model file:
    * model/model.py, contains the deep models for sentence representation.
-* training framework: train.py - preprocesses the data and trains the network.
+* training framework: train.py - preprocesses the data and trains the model.
 * configuration files:
-   * i.e. trec/trec.conf, the config file used to set the dataset and networks.
+   * i.e. trec/trec.conf, the config file used to set the datasets and models.
 * help function: utils/utils.py. some helper functions.
 
 ## Models [IN PROGRESS]
